@@ -9,9 +9,7 @@ This script will help you achieve this via parsing the Azure Activity Logs which
 2. Download SelfService_RBAC_Restore.ps1 and then update the following to match your subscription ID
 Connect-AzAccount -Subscription "00000000-0000-0000-0000-000000000000"
 
-3. Next confirm the general timeframe your subscription was transferred, so the Azure Activity Logs can be parsed for deleted role assignments in that timeframe and update the following lines from the script:
-
-$fromDate = "2020-09-21T10:00"
+3. Next confirm the general timeframe your subscription was transferred, so the Azure Activity Logs can be parsed for deleted role assignments in that timeframe and update the following lines from the script: $fromDate = "2020-09-21T10:00"
 $toDate = "2020-09-21T19:00"
 
 4. Finally, run the script and sign in with the subscription's current Owner\ Service Admin account.  This script will parse your subscription's activity log and restore all deleted role assignments
