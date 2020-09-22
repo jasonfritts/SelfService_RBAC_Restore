@@ -1,4 +1,4 @@
-# SelfService RBAC Restore
+# Self Service RBAC Restore
 If you perform any operation on your Azure Subscription which causes it to switch AAD tenants, you will lose all RBAC role assignments during the transfer.  The most common ways this occurs is via [Subsription ownership transfers](https://docs.microsoft.com/en-us/azure/cost-management-billing/manage/billing-subscription-transfer) or Subscription owner's choosing ["Change Directory" on the subscription](https://docs.microsoft.com/en-us/azure/active-directory/fundamentals/active-directory-how-subscriptions-associated-directory#associate-a-subscription-to-a-directory).  The only way to restore them is to transfer your subscription back to the original AAD tenant and then re-create the role assignments again.  
 
 This script will help you achieve this via parsing the Azure Activity Logs which have logs for each role assignment deleted during the original transfer.
