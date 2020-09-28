@@ -5,7 +5,7 @@ This script will help you achieve this via parsing the Azure Activity Logs of yo
 
 ## Prerequisites
 
-1. Ensure you have transferred your Azure subscription back to it's original Azure AD tenant \ Owner, otherwise no role assignments can be restored.
+1. Ensure you have transferred your Azure subscription back to it's original Azure AD tenant \ Owner, otherwise no role assignments can be restored.  Depending on how your subscription was originally transferred, follow [Subsription ownership transfers](https://docs.microsoft.com/en-us/azure/cost-management-billing/manage/billing-subscription-transfer) or  ["Change Directory" on the subscription](https://docs.microsoft.com/en-us/azure/active-directory/fundamentals/active-directory-how-subscriptions-associated-directory#associate-a-subscription-to-a-directory) to transfer the subscription back to it's original directory \ owner.
 2. Ensure you have Azure PowerShell installed: https://docs.microsoft.com/en-us/powershell/azure/install-az-ps
 
 ## Restore Steps
