@@ -1,16 +1,18 @@
 # Self Service RBAC Restore
 If you perform any operation on your Azure Subscription which causes it to switch AAD tenants, you will lose all RBAC role assignments during the transfer.  The most common ways this occurs is via [Subsription ownership transfers](https://docs.microsoft.com/en-us/azure/cost-management-billing/manage/billing-subscription-transfer) or Subscription owner's choosing ["Change Directory" on the subscription](https://docs.microsoft.com/en-us/azure/active-directory/fundamentals/active-directory-how-subscriptions-associated-directory#associate-a-subscription-to-a-directory).  The only way to restore them is to transfer your subscription back to the original AAD tenant and then re-create the role assignments again.  
 
-This script will help you achieve this via parsing the Azure Activity Logs which have logs for each role assignment deleted during the original transfer.
+This script will help you achieve this via parsing the Azure Activity Logs of your Subscription which have logs for each role assignment deleted during the original transfer.
 
 ## Prerequisites
 
 1. Ensure you have transferred your Azure subscription back to it's original Azure AD tenant \ Owner, otherwise no role assignments can be restored.
 2. Ensure you have Azure PowerShell installed: https://docs.microsoft.com/en-us/powershell/azure/install-az-ps
-3. Download [SelfService_RBAC_Restore.ps1](https://github.com/jasonfritts/SelfService_RBAC_Restore/blob/master/SelfService_RBAC_Restore.ps1) locally to your workstation and then update the following to match your subscription ID
+
+## Restore Steps
+1. Download [SelfService_RBAC_Restore.ps1](https://github.com/jasonfritts/SelfService_RBAC_Restore/blob/master/SelfService_RBAC_Restore.ps1) locally to your workstation and then update the following to match your subscription ID
 Connect-AzAccount -Subscription "00000000-0000-0000-0000-000000000000"
 
-4. Next confirm the general timeframe your subscription was transferred, so the Azure Activity Logs can be parsed for deleted role assignments in that timeframe and update the following lines from the script: $fromDate = "2020-09-21T10:00"
+2. Next confirm the general timeframe your subscription was transferred, so the Azure Activity Logs can be parsed for deleted role assignments in that timeframe and update the following lines from the script: $fromDate = "2020-09-21T10:00"
 $toDate = "2020-09-21T19:00".  You can find the proper timeframe by reviewing your subscription logs in the Azure Activity Log portal for your subscription (https://portal.azure.com/#blade/Microsoft_Azure_Monitoring/AzureMonitoringBrowseBlade/activityLog)  and filtering by Subscription=SubscriptionID and by adding the new filter Operation=Delete role assignment.
 
 Example of Azure Monitor Filter Parameters:
@@ -19,6 +21,6 @@ Example of Azure Monitor Filter Parameters:
 Example of Azure Monitor Deleted Role Assignment -> JSON details
 <img src="https://github.com/jasonfritts/SelfService_RBAC_Restore/blob/master/Example_AzureMonitor_DeletedRoleAssignmentDetails.png">
           
-5. Finally, run the script and sign in with the subscription's current Owner\ Service Admin account.  This script will parse your subscription's activity log and restore all deleted role assignments found in the specified time period
+3. Finally, run the script and sign in with the subscription's current Owner\ Service Admin account.  This script will parse your subscription's activity log and restore all deleted role assignments found in the specified time period
 
-6. Each restored role assignment will be output to the screen.  Depending on the number of role assignments it may take 5-10 minutes to complete.
+4. Each restored role assignment will be output to the screen.  Depending on the number of role assignments it may take 5-10 minutes to complete.
