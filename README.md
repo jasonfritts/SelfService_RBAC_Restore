@@ -13,8 +13,11 @@ Connect-AzAccount -Subscription "00000000-0000-0000-0000-000000000000"
 4. Next confirm the general timeframe your subscription was transferred, so the Azure Activity Logs can be parsed for deleted role assignments in that timeframe and update the following lines from the script: $fromDate = "2020-09-21T10:00"
 $toDate = "2020-09-21T19:00".  You can find the proper timeframe by reviewing your subscription logs in the Azure Activity Log portal for your subscription (https://portal.azure.com/#blade/Microsoft_Azure_Monitoring/AzureMonitoringBrowseBlade/activityLog)  and filtering by Subscription=SubscriptionID and by adding the new filter Operation=Delete role assignment.
 
-Example:
+Example of Azure Monitor Filter Parameters:
 <img src="https://github.com/jasonfritts/SelfService_RBAC_Restore/blob/master/Example_AzureMonitor_DeleteRoleAssignment.png">
+
+Example of Azure Monitor Deleted Role Assignment -> JSON details
+<img src="https://github.com/jasonfritts/SelfService_RBAC_Restore/blob/master/Example_AzureMonitor_DeletedRoleAssignmentDetails.png">
           
 5. Finally, run the script and sign in with the subscription's current Owner\ Service Admin account.  This script will parse your subscription's activity log and restore all deleted role assignments found in the specified time period
 
