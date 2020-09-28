@@ -10,7 +10,6 @@ Connect-AzAccount -Subscription "f2ceb5da-e353-42f5-9a84-070cf6a78a9b"
 # 1. Browse to the https://portal.azure.com/#blade/Microsoft_Azure_ActivityLog/ActivityLogBlade
 # 2. Change "Subscription" filter to include your Azure Subscription that lost role assignments, Add a new filter type for "Operation" and choose "Delete role assignment"
 # 3. Consult the returned logs to determine the timeframe of role assignment deletion
-# 4. Use this timestamp converted to UTC and update below parameters
 
 $fromDate = "2020-09-21T10:00"
 $toDate = "2020-09-21T19:00"
