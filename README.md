@@ -5,14 +5,15 @@ This script will help you achieve this via parsing the Azure Activity Logs which
 
 ## Prerequisites
 
-1. Ensure you have Azure PowerShell installed: https://docs.microsoft.com/en-us/powershell/azure/install-az-ps
-2. Download [SelfService_RBAC_Restore.ps1](https://github.com/jasonfritts/SelfService_RBAC_Restore/blob/master/SelfService_RBAC_Restore.ps1) locally to your workstation and then update the following to match your subscription ID
+1. Ensure you have transferred your Azure subscription back to it's original Azure AD tenant \ Owner, otherwise no role assignments can be restored.
+2. Ensure you have Azure PowerShell installed: https://docs.microsoft.com/en-us/powershell/azure/install-az-ps
+3. Download [SelfService_RBAC_Restore.ps1](https://github.com/jasonfritts/SelfService_RBAC_Restore/blob/master/SelfService_RBAC_Restore.ps1) locally to your workstation and then update the following to match your subscription ID
 Connect-AzAccount -Subscription "00000000-0000-0000-0000-000000000000"
 
-3. Next confirm the general timeframe your subscription was transferred, so the Azure Activity Logs can be parsed for deleted role assignments in that timeframe and update the following lines from the script: $fromDate = "2020-09-21T10:00"
+4. Next confirm the general timeframe your subscription was transferred, so the Azure Activity Logs can be parsed for deleted role assignments in that timeframe and update the following lines from the script: $fromDate = "2020-09-21T10:00"
 $toDate = "2020-09-21T19:00" , note these timeframes are in UTC timezone .  You can find the proper timeframe by reviewing your subscription logs in the Azure Activity Log portal for your subscription (https://portal.azure.com/#blade/Microsoft_Azure_Monitoring/AzureMonitoringBrowseBlade/activityLog)  and filtering by Subscription=SubscriptionID and by adding the new filter Operation=Delete role assignment.
 
 Example:
 <img src="https://github.com/jasonfritts/SelfService_RBAC_Restore/blob/master/Example_AzureMonitor_DeleteRoleAssignment.png">
           
-4. Finally, run the script and sign in with the subscription's current Owner\ Service Admin account.  This script will parse your subscription's activity log and restore all deleted role assignments found in the specified time period
+5. Finally, run the script and sign in with the subscription's current Owner\ Service Admin account.  This script will parse your subscription's activity log and restore all deleted role assignments found in the specified time period
