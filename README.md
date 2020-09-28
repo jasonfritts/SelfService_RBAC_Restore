@@ -17,3 +17,5 @@ Example:
 <img src="https://github.com/jasonfritts/SelfService_RBAC_Restore/blob/master/Example_AzureMonitor_DeleteRoleAssignment.png">
           
 5. Finally, run the script and sign in with the subscription's current Owner\ Service Admin account.  This script will parse your subscription's activity log and restore all deleted role assignments found in the specified time period
+
+6. Each restored role assignment will be output to the screen.  Depending on the number of role assignments it may take 5-10 minutes to complete.
