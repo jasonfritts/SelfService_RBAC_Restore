@@ -27,3 +27,10 @@ Example of Azure Monitor Deleted Role Assignment -> JSON details
 6. Finally, run the script and sign in with the subscription's current Owner\ Service Admin account.  This script will parse your subscription's activity log and restore all deleted role assignments found in the specified time period
 
 7. Each restored role assignment will be output to the screen.  Depending on the number of role assignments it may take 5-10 minutes to complete.
+
+Example of succesfull output:
+<img src="https://github.com/jasonfritts/SelfService_RBAC_Restore/blob/master/Example_RestoredRoleAssignment.PNG">
+
+Example of restored role assignments after restoration:
+<img src="https://github.com/jasonfritts/SelfService_RBAC_Restore/blob/master/Example_RestoredRoleAssignments.png">
+
