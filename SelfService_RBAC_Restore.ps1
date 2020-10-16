@@ -44,6 +44,7 @@ if ($token.ExpiresOn -le [System.DateTime]::UtcNow) {
 
 
 # Get access token to management.azure.com API
+$tenant = $ctx.Tenant.Id
 $token = $token | ? {($_.Authority -eq "https://login.windows.net/$tenant/") -and ($_.TenantId -eq $tenant)}
 
 #Get deleted role assignments from management API
