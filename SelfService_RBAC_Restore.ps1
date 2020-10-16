@@ -3,7 +3,7 @@
 # Verify you have installed the Az PowerShell module  (https://docs.microsoft.com/en-us/powershell/azure/install-az-ps)
 
 # REPLACE the subscriptionID with your own subscription ID, and then login with AAD credentials for Subscription Admin (Owner \ Service Admin)
-$AzureSubId = "f2ceb5da-e353-42f5-9a84-070cf6a78a9b"
+$AzureSub = "f2ceb5da-e353-42f5-9a84-070cf6a78a9b"
 
 # REPLACE with the timeframe that your role assignments were deleted
 $fromDate = "2020-10-16"
