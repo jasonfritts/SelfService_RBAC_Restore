@@ -2,17 +2,15 @@
 # Verify subscription has been transferred back to it's original AAD tenant\directory before attempting to restore role assignments
 # Verify you have installed the Az PowerShell module  (https://docs.microsoft.com/en-us/powershell/azure/install-az-ps)
 
-# Replace the subscriptionID with your own subscription ID, and then login with AAD credentials for Subscription Admin (Owner \ Service Admin)
-$subscriptionID = "f2ceb5da-e353-42f5-9a84-070cf6a78a9b"
+# REPLACE the subscriptionID with your own subscription ID, and then login with AAD credentials for Subscription Admin (Owner \ Service Admin)
+$AzureSubId = "f2ceb5da-e353-42f5-9a84-070cf6a78a9b"
 
-# Replace the fromDate and toDate strings to include the timeframe that the roleassignments were deleted
-# If you do not know this timeframe, you can use Azure Portal to find
-# 1. Browse to the https://portal.azure.com/#blade/Microsoft_Azure_ActivityLog/ActivityLogBlade
-# 2. Change "Subscription" filter to include your Azure Subscription that lost role assignments, Add a new filter type for "Operation" and choose "Delete role assignment"
-# 3. Consult the returned logs to determine the timeframe of role assignment deletion
+# REPLACE with the timeframe that your role assignments were deleted
+$fromDate = "2020-10-16"
+$toDate = "2020-10-17"
 
-$fromDate = "2020-09-30T10:32"
-$toDate = "2020-09-30T10:40"
+
+
 
 
 
@@ -20,33 +18,63 @@ $toDate = "2020-09-30T10:40"
 #### DO NOT MODIFY BELOW LINES ####
 ###################################
 
-Connect-AzAccount -Subscription $subscriptionID
+Write-Host -ForegroundColor Yellow "Sign in with your subscription's current Owner"
 
-# Parse Azure Activity Logs for Subscription to find all operations where RBAC role assignments were deleted
-$deletedRoleAssignmentLogs = Get-AzLog -StartTime ([datetime]$fromdate) -EndTime ([datetime]$toDate) | ? {($_.OperationName.Value -eq "Microsoft.Authorization/roleAssignments/delete") -and ($_.Status.Value -eq "Succeeded")}
+$ctx=Get-AzContext
+if ($ctx.Account -eq $null) {
+    Connect-AzAccount -Subscription $AzureSub
+}
+if ($ctx.SubscriptionName -ne $AzureSub) {
+    Set-AzContext -Subscription $AzureSub
+}
+
+$ctx=Get-AzContext
+
+#force context to grab a token for graph
+Get-AzAdUser -UserPrincipalName $ctx.Account.Id
+
+$cache = $ctx.TokenCache
+$cacheItems = $cache.ReadItems()
+
+$token = ($cacheItems | where { $_.Resource -eq "https://management.core.windows.net/" })
+if ($token.ExpiresOn -le [System.DateTime]::UtcNow) {
+    $ac = [Microsoft.IdentityModel.Clients.ActiveDirectory.AuthenticationContext]::new("$($ctx.Environment.ActiveDirectoryAuthority)$($ctx.Tenant.Id)",$token)
+    $token = $ac.AcquireTokenByRefreshToken($token.RefreshToken, "1950a258-227b-4e31-a9cf-717495945fc2", "https://management.core.windows.net")
+}
+
+
+# Get access token to management.azure.com API
+$token = $token | ? {($_.Authority -eq "https://login.windows.net/$tenant/") -and ($_.TenantId -eq $tenant)}
+
+#Get deleted role assignments from management API
+$url1 = "https://management.azure.com/subscriptions/$AzureSub/providers/microsoft.insights/eventtypes/management/values?api-version=2017-03-01-preview&"
+$myfilter = "eventTimestamp ge $fromDate and eventTimestamp le $toDate and operations eq Microsoft.Authorization/roleAssignments/delete"
+$url = $url1+'$filter='+$myfilter
+$deletedRoleAssignmentLogs = Invoke-RestMethod -Headers @{Authorization = "Bearer $($token.AccessToken)"} -Uri $url -Method Get
+$deletedRoleAssignmentLogs = $deletedRoleAssignmentLogs.value
+
+
 $total = $deletedRoleAssignmentLogs.count
+$count = 0
 
- Write-Host -ForegroundColor Yellow "Found $total log entries for operation Delete role assignments on subscription $subscriptionID between $fromDate and $toDate"
- Write-Host -ForegroundColor Yellow "Checking each log found for valid role assignment information.  This may take 5-10 minutes.  Please wait....."
+Write-Host -ForegroundColor Yellow "Found $total log entries for operation Delete role assignments on subscription $subscriptionID between $fromDate and $toDate"
+Write-Host -ForegroundColor Yellow "Checking each log found for valid role assignment information.  Some deleted assignments in logs may be system role assignments only, so should be ignored.  This may take 5-10 minutes.  Please wait....."
 
 $deletedAssignments = @()
 
-# Create a PowerShell object containing all the necessary data (PrincipalId, RoleDefinitionId, Scope) from parsed logs to restore role assignments
 foreach($log in $deletedRoleAssignmentLogs){
-   
-    
-    if($log.Properties.Content.roleDefinitionId){$assignment = $log.Properties.Content}
-    if($log.Properties.Content.responseBody){
-        $assignment = $log.Properties.Content.responseBody | ConvertFrom-Json
-        $assignment = $assignment.properties
-        $assignment.roleDefinitionId = $assignment.roleDefinitionId.Substring($assignment.roleDefinitionId.Length - 36)
 
-        }
-
+  
     
+    $assignment = $log.Properties
+
+    Write-Host -ForegroundColor Yellow "Checking log $count of $total for valid information.  Most deleted assignments will be system only, and can be ignored.  This may take 5-10 minutes. Please wait...."
+    
+    $count++
 
     $ErrorActionPreference = 'silentlycontinue'
     if(Get-AzRoleDefinition -Id ([guid]$assignment.roleDefinitionId)){
+         write-host -ForegroundColor Green "Valid role assignment $assignment found"
          $deletedAssignment = New-Object -TypeName psobject 
          $deletedAssignment | Add-Member -MemberType NoteProperty -Name PrincipalId -Value ([guid]$assignment.principalId)
          $deletedAssignment | Add-Member -MemberType NoteProperty -Name RoleDefinitionId -Value ([guid]$assignment.roleDefinitionId)
@@ -58,20 +86,16 @@ foreach($log in $deletedRoleAssignmentLogs){
    }
 
 
-# The Azure Activity logs will have reference to a number of role definitions which are system roles and cannot be assigned by customer themselves.
-# These roles can be skipped as they are automatically re-assigned after subscription transfer, they will cause errors to be displayed such as
-# "The specified role definition with ID '6efa92ca-56b6-40af-a468-5e3d2b5232f0' does not exist."  Where 6efa92ca-56b6-40af-a468-5e3d2b5232f0
-# Is a system role that cannot be assigned by customers.
-
-# The remaining roles will be listed via the output of the below command as being succesfully re-assigned
-
   $ErrorActionPreference = 'silentlycontinue'
 
   $count = 0
   $total = $deletedAssignments.count
 
-  Write-Host -ForegroundColor Yellow "Found $total valid role assignments to restore."
+  $deletedAssignments | Out-GridView -Title "Found $total valid role assignments to restore. See below"
 
+  $response = Read-Host "Proceed with restoring the displayed assignments? (Y\N): "
+
+  if($response -match "Y"){
     foreach($da in $deletedAssignments){
         $count++
         Write-Host -ForegroundColor Yellow "Restoring role assignment $count of $total ...."
@@ -79,5 +103,10 @@ foreach($log in $deletedRoleAssignmentLogs){
         }
 
 
-  Write-Host -ForegroundColor Yellow "Role assignment restoration has completed for $subscriptionId"
-  Read-Host “Press ENTER to continue...”
+  Write-Host -ForegroundColor Green "Role assignment restoration has completed for $subscriptionId"
+  }
+  
+  Read-Host “Press ENTER to quit...” -
+
+
+
