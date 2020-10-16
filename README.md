@@ -12,7 +12,7 @@ This script will help you achieve this via parsing the Azure Activity Logs of yo
 1. Download [SelfService_RBAC_Restore.ps1](https://github.com/jasonfritts/SelfService_RBAC_Restore/blob/master/SelfService_RBAC_Restore.ps1) locally to your workstation
 
 2. Open PowerShell ISE and edit SelfService_RBAC_Restore.ps1
-3. Update the line 6 to reflect your subscription ID.  Example: $subscriptionID = "f2ceb5da-e353-42f5-9a84-070cf6a78a9b"
+3. Update the line 6 to reflect your subscription ID.  Example: $AzureSubId = "f2ceb5da-e353-42f5-9a84-070cf6a78a9b"
 4. Next confirm the general timeframe your subscription was transferred or role assignments were deleted by reviewing your subscription logs in the Azure Activity Log portal for your subscription (https://portal.azure.com/#blade/Microsoft_Azure_Monitoring/AzureMonitoringBrowseBlade/activityLog)  and filtering by Subscription=SubscriptionID and by adding the new filter Operation=Delete role assignment)  Find the Timestamp listed as when the role assignments were deleted
 
 Example of Azure Monitor Filter Parameters:
@@ -21,7 +21,7 @@ Example of Azure Monitor Filter Parameters:
 Example of Azure Monitor Deleted Role Assignment -> JSON details
 <img src="https://github.com/jasonfritts/SelfService_RBAC_Restore/blob/master/Example_AzureMonitor_DeletedRoleAssignmentDetails.png">
 
-5. Update line 14 and 15 from the script to reflect timeframe that role assignments were deleted.  Example: $fromDate = "2020-09-21T10:00" and $toDate = "2020-09-21T19:00".  
+5. Update line 9 and 10 from the script to reflect timeframe that role assignments were deleted.  Example: $fromDate = "2020-10-16" and $toDate = "2020-10-17".  
 
         
 6. Finally, run the script and sign in with the subscription's current Owner\ Service Admin account.  This script will parse your subscription's activity log and restore all deleted role assignments found in the specified time period
@@ -29,7 +29,7 @@ Example of Azure Monitor Deleted Role Assignment -> JSON details
 7. Each restored role assignment will be output to the screen.  Depending on the number of role assignments it may take 5-10 minutes to complete.
 
 Example of succesfull output:
-<img src="https://github.com/jasonfritts/SelfService_RBAC_Restore/blob/master/Example_RestoredRoleAssignment.PNG">
+<img src="https://github.com/jasonfritts/SelfService_RBAC_Restore/blob/master/Example_RestoredRoleAssignment.png">
 
 Example of restored role assignments after restoration:
 <img src="https://github.com/jasonfritts/SelfService_RBAC_Restore/blob/master/Example_RestoredRoleAssignments.png">
