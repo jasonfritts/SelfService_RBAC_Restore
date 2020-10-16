@@ -24,7 +24,7 @@ $ctx=Get-AzContext
 if ($ctx.Account -eq $null) {
     Connect-AzAccount -Subscription $AzureSub
 }
-if ($ctx.SubscriptionName -ne $AzureSub) {
+if ($ctx.Subscription.Id -ne $AzureSub) {
     Set-AzContext -Subscription $AzureSub
 }
 
