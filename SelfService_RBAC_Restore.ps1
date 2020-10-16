@@ -92,7 +92,7 @@ foreach($log in $deletedRoleAssignmentLogs){
   $count = 0
   $total = $deletedAssignments.count
 
-  $deletedAssignments | Out-GridView -Title "Found $total valid role assignments to restore. See below"
+  $deletedAssignments | Out-GridView -Title "Found $total valid role assignments to restore. See below and close window to continue."
 
   $response = Read-Host "Proceed with restoring the displayed assignments? (Y\N): "
 
@@ -104,7 +104,7 @@ foreach($log in $deletedRoleAssignmentLogs){
         }
 
 
-  Write-Host -ForegroundColor Green "Role assignment restoration has completed for $subscriptionId"
+  Write-Host -ForegroundColor Green "Role assignment restoration has completed for $AzureSub"
   }
   
   Read-Host “Press ENTER to quit...” -
